@@ -43,7 +43,11 @@ public class Bookingmain {
 		if(login==3)
 			System.out.println("Admin Login Successfull");
 		else if(login==1)
+		{
 			System.out.println("Login Successfull");
+			User_actions usr = new User_actions();
+			usr.main(login_user_id);
+		}
 		else if(login==2)
 		{
 			System.out.println("Hotel Administrator Login Successfull");

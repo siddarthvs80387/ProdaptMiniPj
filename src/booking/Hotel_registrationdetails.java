@@ -90,6 +90,43 @@ class Hotel_registrationdetails
 		this.deluxe_room_price = deluxe_room_price;
 	}
 	
+	// Update Details In Table
+	public void update_details(int login_user_id)
+	{
+		Scanner sc = new Scanner(System.in);
+		try
+		{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/booking","root","root");
+			PreparedStatement stmt = con.prepareStatement("select * from hotel_details where user_id=?");
+			stmt.setInt(1, login_user_id);
+			ResultSet rs = stmt.executeQuery();
+			
+			while(rs.next())
+			{
+				System.out.println();
+				System.out.println("Hotel ID: "+rs.getString("hotel_id"));
+				System.out.println("Hotel Name: "+rs.getString("hotel_name"));
+				System.out.println();
+			}
+			// Get Hotel Id For Update 
+			System.out.println("Select HotelID To Update Settings: ");
+			int hotelid = sc.nextInt();
+			System.out.println("Select Detail To Update");
+			System.out.println("1. Edit Single Room Details");
+			System.out.println("2. Edit Double Room Details");
+			System.out.println("3. Edit Deluxe Room Details");
+			System.out.println("4. Edit Contact Number");
+			con.close();
+		}
+		catch(Exception e)
+		{
+			System.out.println(e);
+		}
+
+	}
+	
+	// Hotel Registration & Room Creation
 	public void registration(int login_user_id)
 	{
 		try
@@ -150,6 +187,7 @@ class Hotel_registrationdetails
 		}
 	}
 	
+	// Main
 	public int main(int login_user_id)
 	{
 		Scanner sc = new  Scanner(System.in);
@@ -225,7 +263,10 @@ class Hotel_registrationdetails
 					
 					while(rs.next())
 					{
+						System.out.println();
+						System.out.println("Hotel ID: "+rs.getString("hotel_id"));
 						System.out.println("Hotel Name: "+rs.getString("hotel_name"));
+						System.out.println();
 					}
 					con.close();
 				}
@@ -237,6 +278,10 @@ class Hotel_registrationdetails
 			if(hotel_console_choice==6)
 			{
 				break;
+			}
+			if(hotel_console_choice==3)
+			{
+				update_details(login_user_id);
 			}
 			
 		}while(hotel_console_choice!=0);
