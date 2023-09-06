@@ -255,7 +255,71 @@ public class User_actions
 	// Cancel Booking;
 	public void cancelbooking(int login_user_id)
 	{
+		viewbookings(login_user_id);
+		System.out.println("Enter The Booking ID For Cancellation");
+		Scanner sc = new Scanner(System.in);
+		int bookingid=sc.nextInt();
 		
+		try
+		{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/booking","root","root");
+			PreparedStatement stmt = con.prepareStatement("call delete_reservation(?);");
+			stmt.setInt(1, bookingid);
+			stmt.executeQuery();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		sc.close();
+	}
+	
+	//Enter Review
+	public void reviews(int login_user_id)
+	{
+		ArrayList<String> h_name = new ArrayList<String>();
+		ArrayList<Integer> h_id = new ArrayList<Integer>();
+		Scanner sc = new Scanner(System.in);
+		try
+		{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/booking","root","root");
+			PreparedStatement stmt = con.prepareStatement("select hotel_id,hotel_name from hotel_details where hotel_id in (select hotel_id from user_bookingid where user_id=?) order by hotel_id;");
+			stmt.setInt(1, login_user_id);
+			ResultSet rs = stmt.executeQuery();
+			while(rs.next())
+			{
+				h_id.add(rs.getInt("hotel_id"));
+				h_name.add(rs.getString("hotel_name"));
+			}
+			for(int i=0;i<h_name.size();i++)
+			{
+				System.out.println();
+				System.out.println("Hotel ID: "+h_id.get(i));
+				System.out.println("Hotel Name: "+h_name.get(i));
+			}
+			System.out.println("Enter the Hotel Id To Leave Review");
+			int id = sc.nextInt();
+			System.out.println("How Did You Enjoy Your Stay(1-5)");
+			int rating = sc.nextInt();
+			sc.nextLine();
+			System.out.println("Please Leave Your Valuable Feedback");
+			String rev = sc.nextLine();
+			int ind = h_id.indexOf(id);
+			PreparedStatement stmt1 = con.prepareStatement("insert into review (hotel_name,hotel_id,user_id,rating,feedback) values (?,?,?,?,?)");
+			stmt1.setString(1,h_name.get(ind));
+			stmt1.setInt(2, h_id.get(ind));
+			stmt1.setInt(3, login_user_id);
+			stmt1.setInt(4, rating);
+			stmt1.setString(5, rev);
+			stmt1.executeUpdate();
+			
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	public int main(int login_user_id)
@@ -267,6 +331,7 @@ public class User_actions
 			System.out.println("1.Book Hotel");
 			System.out.println("2.View Bookings");
 			System.out.println("3.Cancel Bookings");
+			System.out.println("4.Leave A Review");
 			choice = sc.nextInt();
 			sc.nextLine();
 			if(choice==1)
@@ -308,6 +373,12 @@ public class User_actions
 			if(choice==3)
 			{
 				cancelbooking(login_user_id);
+				System.out.println("Booking Cancelled");
+				System.out.println("We Regret To See You Go");
+			}
+			if(choice==4)
+			{
+				reviews(login_user_id);
 			}
 		}
 		while(choice!=0);
