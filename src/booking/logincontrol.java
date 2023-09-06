@@ -82,6 +82,11 @@ public class logincontrol
 				{
 					break;
 				}
+				else
+				{
+					System.out.println("Username/Password Incorrect!!!");
+					System.out.println();
+				}
 			}
 			else if(choice==2)
 			{
