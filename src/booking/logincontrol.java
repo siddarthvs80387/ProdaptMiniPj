@@ -29,7 +29,7 @@ public class logincontrol
 		}
 		catch(Exception e)
 		{
-			System.out.println("Username or Phone Already Exists" +e);
+			System.out.println("Username or Phone Already Exists" );
 			return 0;
 		}
 	}
@@ -57,7 +57,7 @@ public class logincontrol
 		}
 		catch(Exception e)
 		{
-			System.out.println("Failed to connect "+e);
+			//System.out.println("Failed to connect "+e);
 			return 0;
 		} 
 	}

@@ -105,18 +105,62 @@ class Hotel_registrationdetails
 			while(rs.next())
 			{
 				System.out.println();
-				System.out.println("Hotel ID: "+rs.getString("hotel_id"));
+				System.out.println("Hotel ID: "+rs.getInt("hotel_id"));
 				System.out.println("Hotel Name: "+rs.getString("hotel_name"));
+				System.out.println("Hotel City: "+rs.getString("hotel_city"));
+				System.out.println("Single Room Price: "+rs.getFloat("single_room_price"));
+				System.out.println("Double Room Price: "+rs.getFloat("double_room_price"));
+				System.out.println("Deluxe Room Price: "+rs.getFloat("deluxe_room_price"));
 				System.out.println();
 			}
+			ArrayList<Integer> available = new ArrayList<Integer>();
+			PreparedStatement stmt12 = con.prepareStatement("select * from hotel_details where user_id=?");
+			stmt12.setInt(1, login_user_id);
+			ResultSet rs12 = stmt12.executeQuery();
+			
+			while(rs12.next())
+			{
+			
+				available.add(rs12.getInt("hotel_id"));
+				
+			}
 			// Get Hotel Id For Update 
+			
 			System.out.println("Select HotelID To Update Settings: ");
 			int hotelid = sc.nextInt();
+			if(available.contains(hotelid))
+			{
 			System.out.println("Select Detail To Update");
-			System.out.println("1. Edit Single Room Details");
-			System.out.println("2. Edit Double Room Details");
-			System.out.println("3. Edit Deluxe Room Details");
-			System.out.println("4. Edit Contact Number");
+			System.out.println("1. Edit Single Room Price");
+			System.out.println("2. Edit Double Room Price");
+			System.out.println("3. Edit Deluxe Room Price");
+			System.out.println("Enter Choice");
+			int ch = sc.nextInt();
+			System.out.println("Enter Price: ");
+			float newprice = sc.nextFloat();
+			String str ="";
+			if (ch==1)
+			{
+				str="update hotel_details set single_room_price = ? where hotel_id=?;";
+			}
+			else if(ch==2)
+			{
+				str="update hotel_details set double_room_price = ? where hotel_id=?;";
+			}
+			else if(ch==3)
+			{
+				str="update hotel_details set deluxe_room_price = ? where hotel_id=?;";
+			}
+			PreparedStatement stmt1 = con.prepareStatement(str);
+			stmt1.setFloat(1, newprice);
+			stmt1.setInt(2, hotelid);
+			stmt1.executeUpdate();
+			System.out.println("Updates Applied\n");
+			}
+			else
+			{
+				System.out.println("Invalid Hotel ID\n");
+			}
 			con.close();
 		}
 		catch(Exception e)
@@ -187,24 +231,78 @@ class Hotel_registrationdetails
 		}
 	}
 	
+	public void view_reviews(int login_user_id)
+	{
+		Scanner sc = new Scanner(System.in);
+		
+		try
+		{
+			Class.forName("com.mysql.cj.jdbc.Driver");
+			Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/booking","root","root");
+			System.out.println("\nEnter Hotel ID To View Reviews");
+			int h_id_review = sc.nextInt();
+			sc.nextLine();
+			
+			ArrayList<Integer> available = new ArrayList<Integer>();
+			PreparedStatement stmt12 = con.prepareStatement("select * from hotel_details where user_id=?");
+			stmt12.setInt(1, login_user_id);
+			ResultSet rs12 = stmt12.executeQuery();
+			
+			while(rs12.next())
+			{
+			
+				available.add(rs12.getInt("hotel_id"));
+				
+			}
+			
+			if(available.contains(h_id_review))
+			{
+			
+				PreparedStatement review_stmt = con.prepareStatement("select feedback from review where hotel_id=? limit 5;");
+				review_stmt.setInt(1, h_id_review);
+				ResultSet review_res = review_stmt.executeQuery();
+				int ctr=0;
+				while(review_res.next())
+				{
+					ctr+=1;
+					System.out.println(ctr+". "+review_res.getString("feedback"));
+					System.out.println();
+				}
+				if(ctr==0)
+				{
+					System.out.println("No Reviews Available\n");
+				}
+			}
+			else
+			{
+				System.out.println("Enter A Valid Hotel ID To View Reviews\n");
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	// Main
 	public int main(int login_user_id)
 	{
 		Scanner sc = new  Scanner(System.in);
+		
 		int hotel_console_choice=0;
 		do
 		{
+			System.out.println("\nHotel Administrator \n");
 			System.out.println("1.Registration");
 			System.out.println("2.View Registered Hotels");
 			System.out.println("3.Update Details");
 			System.out.println("4.View Reviews");
-			System.out.println("5.Payment");
-			System.out.println("6.Logout");
+			System.out.println("5.Logout");
 			hotel_console_choice = sc.nextInt();
 			sc.nextLine();
 			if(hotel_console_choice==1)
 			{
-				System.out.println("Enter Hotel Name: ");
+				System.out.println("\nEnter Hotel Name: ");
 				setHotel_name(sc.nextLine());
 				System.out.println("Enter Hotel City: ");
 				setHotel_city(sc.nextLine());
@@ -230,7 +328,7 @@ class Hotel_registrationdetails
 				
 				//Printing Details For Confirmation
 				System.out.println();
-				System.out.println("Confirm Details");
+				System.out.println("\nConfirm Details");
 				System.out.println("Hotel Name: "+getHotel_name());
 				System.out.println("Hotel City: "+getHotel_city());
 				System.out.println("Hotel Locality: "+getHotel_locality());
@@ -248,7 +346,7 @@ class Hotel_registrationdetails
 				{
 					
 					registration(login_user_id);
-					System.out.println("Confirmed Registration");
+					System.out.println("Confirmed Registration\n");
 				}
 			}
 			if(hotel_console_choice==2)
@@ -266,7 +364,8 @@ class Hotel_registrationdetails
 						System.out.println();
 						System.out.println("Hotel ID: "+rs.getString("hotel_id"));
 						System.out.println("Hotel Name: "+rs.getString("hotel_name"));
-						System.out.println();
+						System.out.println("Hotel City: "+rs.getString("hotel_city"));
+						
 					}
 					con.close();
 				}
@@ -275,13 +374,17 @@ class Hotel_registrationdetails
 					System.out.println(e);
 				}
 			}
-			if(hotel_console_choice==6)
+			if(hotel_console_choice==5)
 			{
 				break;
 			}
 			if(hotel_console_choice==3)
 			{
 				update_details(login_user_id);
+			}
+			if(hotel_console_choice==4)
+			{
+				view_reviews(login_user_id);
 			}
 			
 		}while(hotel_console_choice!=0);

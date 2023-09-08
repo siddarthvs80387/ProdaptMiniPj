@@ -31,9 +31,12 @@ public class Bookingmain {
 	public static void main(String[] args) 
 	{
 		Scanner sc = new Scanner(System.in);
+		System.out.println("\tTravHome");
+		System.out.println("A Fast Way To Book Hotels");
 		int login_user_id = 0,login=0;
 		do
 		{
+			System.out.println();
 			logincontrol user_login = new logincontrol();
 			login_user_id = user_login.main();
 			if(login_user_id!=0)
@@ -52,7 +55,8 @@ public class Bookingmain {
 		}
 		else if(login==2)
 		{
-			System.out.println("Hotel Administrator Login Successfull");
+			System.out.println("Login Successfull!!!\n\n");
+			
 			Hotel_registrationdetails hotel = new Hotel_registrationdetails();
 			int x =hotel.main(login_user_id);
 			System.out.println("Logout Successfull");
